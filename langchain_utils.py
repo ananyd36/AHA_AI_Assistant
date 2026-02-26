@@ -10,7 +10,7 @@ from chroma_utils import vectorstore
 
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
-retriever = vectorstore.as_retriever(search_kwargs={"k": 1})
+retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
 output_parser = StrOutputParser()
 
@@ -30,7 +30,7 @@ contextualize_q_prompt = ChatPromptTemplate.from_messages([
 ])
 
 qa_prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful AI assistant. Only use the following context to answer the user's question."),
+    ("system", "You are a helpful AI assistant. Only use the following context to answer the user's question. If something is not mentioned in the context, say you don't know. Always use all available information in the context to answer the question. Context: {context}"),
     ("system", "Context: {context}"),
     MessagesPlaceholder(variable_name="chat_history"),
     ("human", "{input}")
