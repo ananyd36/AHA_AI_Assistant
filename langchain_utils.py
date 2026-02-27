@@ -3,6 +3,11 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
+
+from langchain.retrievers.multi_query import MultiQueryRetriever
+from langchain_community.document_compressors.flashrank_rerank import FlashrankRerank
+from langchain.retrievers import ContextualCompressionRetriever
+
 from typing import List
 from langchain_core.documents import Document
 import os
@@ -10,7 +15,21 @@ from chroma_utils import vectorstore
 
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
-retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+base_retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
+
+# Add Multi-Query Expansion
+multi_query_retriever = MultiQueryRetriever.from_llm(
+    retriever=base_retriever, 
+    llm=ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+)
+
+# Add reranking with Flashrank
+compressor = FlashrankRerank(top_n=3, model="ms-marco-MiniLM-L-12-v2")
+
+advanced_retriever = ContextualCompressionRetriever(
+    base_compressor=compressor, 
+    base_retriever=multi_query_retriever
+)
 
 output_parser = StrOutputParser()
 
@@ -39,7 +58,7 @@ qa_prompt = ChatPromptTemplate.from_messages([
 
 def get_rag_chain(model_name="gpt-3.5-turbo"):
     llm = ChatOpenAI(model=model_name)
-    history_aware_retriever = create_history_aware_retriever(llm, retriever, contextualize_q_prompt)
+    history_aware_retriever = create_history_aware_retriever(llm, advanced_retriever, contextualize_q_prompt)
     question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
     rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain) 
     return rag_chain

@@ -68,7 +68,7 @@ def index_document_to_chroma(file_path: str, file_id: int, filename: str) -> boo
         
         # 1. Generate a whole-doc summary (using the first few/last few pages or LLM)
         doc_full_text = " ".join([d.page_content for d in raw_splits[:]]) # Getting all context
-        doc_summary_prompt = f"Summarize the whole structure and objectives of each part of this document. Keep in mind as this would be later used to identify specific chunk of the document: {doc_full_text[:]}"
+        doc_summary_prompt = f"Summarize the whole structure and objectives of each part/activity of this Module. Keep in mind as this would be later used to identify specific chunk of the document: {doc_full_text[:]}"
         doc_summary = llm.predict(doc_summary_prompt)
 
         contextualized_docs = []

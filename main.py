@@ -47,7 +47,7 @@ def chat(query_input: QueryInput):
         answer = final_answer,
         session_id = session_id,
         model = query_input.model,
-        sources = ret_sources
+        sources = set(ret_sources)
     )
 
 
