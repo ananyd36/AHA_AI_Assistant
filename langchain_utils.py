@@ -3,26 +3,17 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_community.retrievers import PineconeHybridSearchRetriever
-from langchain_community.document_compressors import FlashrankRerank
-from langchain.retrievers import ContextualCompressionRetriever
 from pinecone_utils import pinecone_index, embeddings, bm25  # reuse shared instances
 
 # Hybrid retriever: alpha=0.5 blends dense (semantic) and sparse (BM25 lexical) equally.
-# top_k=10 gives the reranker enough candidates to pick the best 3 from.
-base_retriever = PineconeHybridSearchRetriever(
+# top_k=5 returns the most relevant chunks directly — no reranker needed with hybrid search.
+advanced_retriever = PineconeHybridSearchRetriever(
     embeddings=embeddings,
     sparse_encoder=bm25,
     index=pinecone_index,
-    top_k=20,
+    top_k=5,
     alpha=0.5,
     text_key="text"
-)
-
-# Reranker narrows top_k results to the 3 most relevant chunks before passing to the LLM
-compressor = FlashrankRerank(top_n=3, model="ms-marco-MiniLM-L-12-v2")
-advanced_retriever = ContextualCompressionRetriever(
-    base_compressor=compressor,
-    base_retriever=base_retriever
 )
 
 contextualize_q_prompt = ChatPromptTemplate.from_messages([
@@ -107,7 +98,7 @@ def get_greeting_response(question: str) -> str:
 
 
 def get_rag_chain(model_name="gpt-3.5-turbo"):
-    """Build a history-aware RAG chain using Pinecone hybrid retrieval and Flashrank reranking."""
+    """Build a history-aware RAG chain using Pinecone hybrid retrieval."""
     llm = ChatOpenAI(model=model_name)
     history_aware_retriever = create_history_aware_retriever(llm, advanced_retriever, contextualize_q_prompt)
     question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
