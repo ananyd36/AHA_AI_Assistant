@@ -2,8 +2,8 @@ import streamlit as st
 from sidebar import display_sidebar
 from chat_interface import display_chat_interface
 
-st.title("AHA Curriculum Assistant")
-st.markdown("Ask questions about the AHA curriculum and get answers based on the uploaded documents!")
+st.title("AHA! Chatbot")
+st.markdown("Ask questions about the Edge AI curriculum and get instant answers based on the uploaded documents.")
 
 # Initialize session state variables
 if "messages" not in st.session_state:
