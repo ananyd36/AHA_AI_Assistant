@@ -2,12 +2,11 @@ langchain==0.3.27
 langchain-openai
 langchain-core
 langchain-community
-docx2txt
 pypdf
-langchain-chroma
 python-multipart
 fastapi
 uvicorn
-chromadb
 python-dotenv
 flashrank
+pinecone
+pinecone-text

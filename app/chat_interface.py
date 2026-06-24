@@ -22,15 +22,10 @@ def display_chat_interface():
                 with st.chat_message("assistant"):
                     st.markdown(response['answer'])
                     
-                    with st.expander("Details"):
-                        # st.subheader("Generated Answer")
-                        # st.code(response['answer'])
-                        # st.subheader("Model Used")
-                        # st.code(response['model'])
-                        # st.subheader("Session ID")
-                        # st.code(response['session_id'])
-                        st.subheader("Sources")
-                        for source in response.get('sources', ["No sources found"]):
-                            st.code(source)
+                    sources = response.get('sources', [])
+                    if sources:
+                        with st.expander("Sources"):
+                            for source in sources:
+                                st.code(source)
             else:
                 st.error("Failed to get a response from the API. Please try again.")
