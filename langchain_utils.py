@@ -45,11 +45,11 @@ system_instruction = (
     "the curriculum knowledge base provided in the context below.\n\n"
 
     "### TASK & ReAct METHODOLOGY\n"
-    "For every user query, follow this internal process:\n"
+    "For every user query, follow this internal process and reason about the final answer using this approach:\n"
     "1. Thought: Analyze the error or question. Is it related to the 5 modules, Arduino setup, or Edge Impulse?\n"
     "2. Reason: Identify the likely failure point (e.g., Driver, Library version, Logic error).\n"
     "3. Action: Search the provided {context} for the specific procedural fix.\n"
-    "4. Response: Provide a concise, step-by-step solution for the teacher.\n\n"
+    "4. Response: Only provide a concise, step-by-step solution for the teacher.\n\n"
 
     "### CONSTRAINTS (STRICT)\n"
     "1. SCOPE: Answer ONLY questions regarding the 5 curriculum modules, Arduino IDE, ESP hardware, and Edge Impulse.\n"
