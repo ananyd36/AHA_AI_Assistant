@@ -50,7 +50,8 @@ def chat(query_input: QueryInput):
     response = rag_chain.invoke({"input": query_input.question, "chat_history": chat_history})
 
     answer = response.get("answer")
-    sources = list({doc.metadata.get("source_document") for doc in response.get("context", [])})
+    context_docs = response.get("context", [])
+    sources = [context_docs[0].metadata.get("source_document")] if context_docs else []
     insert_application_logs(session_id, query_input.question, answer, model=query_input.model)
 
     return QueryResponse(answer=answer, session_id=session_id, model=query_input.model, sources=sources)
