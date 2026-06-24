@@ -18,5 +18,13 @@ if "model" not in st.session_state:
 # Display the sidebar
 display_sidebar()
 
+# Clear chat button
+col1, col2 = st.columns([8, 1])
+with col2:
+    if st.button("Clear", type="secondary"):
+        st.session_state.messages = []
+        st.session_state.session_id = None
+        st.rerun()
+
 # Display the chat interface
 display_chat_interface()
