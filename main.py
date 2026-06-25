@@ -51,7 +51,14 @@ def chat(query_input: QueryInput):
 
     answer = response.get("answer")
     context_docs = response.get("context", [])
-    sources = [context_docs[0].metadata.get("source_document")] if context_docs else []
+    seen, sources = set(), []
+    for doc in context_docs:
+        src = doc.metadata.get("source_document")
+        if src and src not in seen:
+            seen.add(src)
+            sources.append(src)
+        if len(sources) == 3:
+            break
     insert_application_logs(session_id, query_input.question, answer, model=query_input.model)
 
     return QueryResponse(answer=answer, session_id=session_id, model=query_input.model, sources=sources)
