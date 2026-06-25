@@ -16,7 +16,7 @@ An AI-powered curriculum support tool for teachers delivering Edge AI lessons. P
                     ▼
          ┌──────────────────────┐
          │   FastAPI Backend    │  ← Deployed on Fly.io
-         │   (langchain_crash/) │    https://langchain-crash.fly.dev
+         │   (aha_backend/) │    https://xxxxxxxxxxxxx.fly.dev
          └──────────┬───────────┘
                     │
           ┌─────────┴──────────┐
@@ -33,7 +33,7 @@ An AI-powered curriculum support tool for teachers delivering Edge AI lessons. P
 
 ## Components
 
-### Backend — `langchain_crash/`
+### Backend — `aha_assistant/`
 
 FastAPI server handling chat, document ingestion, and retrieval.
 
@@ -104,7 +104,7 @@ Pinecone index must be configured with:
 
 **Backend**
 ```bash
-cd langchain_crash
+cd aha_assistant
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # fill in your keys
@@ -113,14 +113,14 @@ uvicorn main:app --reload
 
 **Streamlit app**
 ```bash
-cd langchain_crash/app
+cd aha_assistant/app
 pip install streamlit requests
 streamlit run streamlit_app.py
 ```
 
 **Bulk document ingestion**
 ```bash
-# Place PDFs in langchain_crash/data/
+# Place PDFs in aha_assistant/data/
 python ingest.py
 ```
 
@@ -130,7 +130,7 @@ python ingest.py
 
 ### Backend (Fly.io)
 
-Live at: `https://langchain-crash.fly.dev`
+Live at: `https://xxxxxxxxxxxx.fly.dev`
 
 ```bash
 fly deploy --ha=false
