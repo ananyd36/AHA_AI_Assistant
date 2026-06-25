@@ -3,12 +3,13 @@ from enum import Enum
 from datetime import datetime
 
 class ModelName(str, Enum):
-    GPT = "gpt-3.5-turbo"
+    GPT35 = "gpt-3.5-turbo"
+    GPT4O_MINI = "gpt-4o-mini"
 
 class QueryInput(BaseModel):
     question: str
     session_id: str = Field(default=None)
-    model: ModelName = Field(default=ModelName.GPT)
+    model: ModelName = Field(default=ModelName.GPT4O_MINI)
 
 class QueryResponse(BaseModel):
     answer: str
