@@ -1,19 +1,37 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.output_parsers import BaseOutputParser
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.retrievers import MultiQueryRetriever
 from langchain_community.retrievers import PineconeHybridSearchRetriever
 from pinecone_utils import pinecone_index, embeddings, bm25  # reuse shared instances
 
-# Hybrid retriever: alpha=0.5 blends dense (semantic) and sparse (BM25 lexical) equally.
-# top_k=5 returns the most relevant chunks directly — no reranker needed with hybrid search.
-advanced_retriever = PineconeHybridSearchRetriever(
+
+class _LineListOutputParser(BaseOutputParser):
+    """Splits newline-separated query variants into a list."""
+    def parse(self, text: str):
+        return [q.strip() for q in text.strip().split("\n") if q.strip()]
+
+
+# Base hybrid retriever: top_k=15 per query variant gives enough candidates for dedup
+_base_retriever = PineconeHybridSearchRetriever(
     embeddings=embeddings,
     sparse_encoder=bm25,
     index=pinecone_index,
-    top_k=5,
+    top_k=15,
     alpha=0.5,
     text_key="text"
+)
+
+# Rewrites the query into 3 curriculum-scoped variants before retrieval
+_rewrite_prompt = ChatPromptTemplate.from_template(
+    "You are helping a teacher find answers in an Edge AI curriculum covering "
+    "Arduino IDE, ESP microcontrollers, and Edge Impulse.\n\n"
+    "Rewrite the question below into 3 alternative versions using different vocabulary "
+    "or angle (one technical, one procedural, one using error/symptom language). "
+    "Output exactly 3 questions, one per line, no numbering.\n\n"
+    "Question: {question}"
 )
 
 contextualize_q_prompt = ChatPromptTemplate.from_messages([
@@ -56,6 +74,13 @@ qa_prompt = ChatPromptTemplate.from_messages([
 
 _scope_llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
 
+# MultiQueryRetriever: generates 3 query variants, retrieves top_k=15 for each, deduplicates
+advanced_retriever = MultiQueryRetriever(
+    retriever=_base_retriever,
+    llm_chain=_rewrite_prompt | _scope_llm | _LineListOutputParser(),
+    parser_key="lines",
+)
+
 _scope_prompt = ChatPromptTemplate.from_template(
     "Classify the message into exactly one of: 'rag', 'greeting', or 'out_of_scope'.\n"
     "- 'rag': question about Arduino, Arduino IDE, ESP microcontrollers, Edge Impulse, embedded systems, or Edge AI curriculum\n"
@@ -91,8 +116,8 @@ def get_greeting_response(question: str) -> str:
     return (_greeting_prompt | _scope_llm).invoke({"question": question}).content
 
 
-def get_rag_chain(model_name="gpt-3.5-turbo"):
-    """Build a history-aware RAG chain using Pinecone hybrid retrieval."""
+def get_rag_chain(model_name="gpt-4o-mini"):
+    """Build a history-aware RAG chain using Pinecone hybrid retrieval with multi-query expansion."""
     llm = ChatOpenAI(model=model_name)
     history_aware_retriever = create_history_aware_retriever(llm, advanced_retriever, contextualize_q_prompt)
     question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)

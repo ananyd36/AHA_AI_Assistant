@@ -13,7 +13,7 @@ if "session_id" not in st.session_state:
     st.session_state.session_id = None
 
 if "model" not in st.session_state:
-    st.session_state.model = "gpt-3.5-turbo"  # Default model, can be changed based on user selection in the future
+    st.session_state.model = "gpt-4o-mini"
 
 # Display the sidebar
 display_sidebar()
