@@ -83,7 +83,7 @@ advanced_retriever = MultiQueryRetriever(
 
 _scope_prompt = ChatPromptTemplate.from_template(
     "Classify the message into exactly one of: 'rag', 'greeting', or 'out_of_scope'.\n"
-    "- 'rag': question about Arduino, Arduino IDE, ESP microcontrollers, Edge Impulse, embedded systems, or Edge AI curriculum\n"
+    "- 'rag': question about the curriculum, modules, activities, setup / configuration guides, Arduino, Arduino IDE, ESP microcontrollers, Edge Impulse, embedded systems.\n"
     "- 'greeting': casual greeting or social message (hi, hello, thanks, how are you, etc.)\n"
     "- 'out_of_scope': anything else\n\n"
     "Message: {question}\n\nCategory:"
