@@ -82,10 +82,24 @@ advanced_retriever = MultiQueryRetriever(
 )
 
 _scope_prompt = ChatPromptTemplate.from_template(
-    "Classify the message into exactly one of: 'rag', 'greeting', or 'out_of_scope'.\n"
-    "- 'rag': question about the curriculum, modules, activities, setup / configuration guides, Arduino, Arduino IDE, ESP microcontrollers, Edge Impulse, embedded systems.\n"
-    "- 'greeting': casual greeting or social message (hi, hello, thanks, how are you, etc.)\n"
-    "- 'out_of_scope': anything else\n\n"
+    "Classify the message below into exactly one of: 'rag', 'greeting', or 'out_of_scope'.\n\n"
+    "- 'rag': any question or statement related to the Edge AI curriculum, including:\n"
+    "  * Curriculum modules, lessons, or student-facing activities\n"
+    "  * Named activities: AHA Adventure Land, AHA Card Game\n"
+    "  * Hardware: ESP microcontrollers, Arduino boards\n"
+    "  * Software: Arduino IDE, Edge Impulse, edge-impulse-daemon\n"
+    "  * Setup, configuration, installation, or troubleshooting\n"
+    "  * Embedded systems or edge machine learning concepts\n"
+    "- 'greeting': casual social messages (hi, hello, thanks, good morning, how are you, etc.)\n"
+    "- 'out_of_scope': anything not related to the curriculum or greetings\n\n"
+    "Examples:\n"
+    "Message: How do I install the Arduino IDE? → rag\n"
+    "Message: What is AHA Adventure Land? → rag\n"
+    "Message: How does the AHA Card Game activity work? → rag\n"
+    "Message: My ESP32 won't connect → rag\n"
+    "Message: Hello! → greeting\n"
+    "Message: Thanks for your help → greeting\n"
+    "Message: What is the capital of France? → out_of_scope\n\n"
     "Message: {question}\n\nCategory:"
 )
 

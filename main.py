@@ -10,7 +10,7 @@ import shutil
 
 from fastapi.middleware.cors import CORSMiddleware
 
-logging.basicConfig(filename='app.log', level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 app.add_middleware(
@@ -70,7 +70,7 @@ def upload_and_index_document(file: UploadFile = File(...)):
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
 
-    temp_path = f"temp_{file.filename}"
+    temp_path = f"temp_{uuid.uuid4()}_{file.filename}"
     try:
         with open(temp_path, "wb") as f:
             shutil.copyfileobj(file.file, f)
