@@ -26,11 +26,17 @@ _base_retriever = PineconeHybridSearchRetriever(
 
 # Rewrites the query into 3 curriculum-scoped variants before retrieval
 _rewrite_prompt = ChatPromptTemplate.from_template(
-    "You are helping a teacher find answers in an Edge AI curriculum covering "
-    "Arduino IDE, ESP microcontrollers, and Edge Impulse.\n\n"
-    "Rewrite the question below into 3 alternative versions using different vocabulary "
-    "or angle (one technical, one procedural, one using error/symptom language). "
-    "Output exactly 3 questions, one per line, no numbering.\n\n"
+    "You are helping a teacher find answers in an Edge AI curriculum with 5 modules.\n"
+    "Module 4 covers two student-facing activities: AHA Adventure Land and AHA Card Game. If this is referenced in the query, remember that these are valid knowledge base entries from module 4.\n\n"
+    "Curriculum reference:\n"
+    "- Hardware: ESP32, ESP microcontrollers, Arduino boards\n"
+    "- Software: Arduino IDE, Edge Impulse, edge-impulse-daemon\n"
+    "- Module 4 activities: AHA Adventure Land, AHA Card Game\n\n"
+    "Rewrite the question below into exactly 3 alternative versions, one per line, no numbering:\n"
+    "1. Technical angle — use hardware/software/tool terminology\n"
+    "2. Procedural angle — frame as a step-by-step or how-to question\n"
+    "3. Curriculum-native angle — use exact names (Module 4, AHA Adventure Land, AHA Card Game) "
+    "and/or error/symptom language a teacher would use in the classroom\n\n"
     "Question: {question}"
 )
 
