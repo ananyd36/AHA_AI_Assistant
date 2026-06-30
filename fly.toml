@@ -18,7 +18,7 @@ primary_region = 'ord'
 
   [[http_service.checks]]
     grace_period = "30s"
-    interval = "15s"
+    interval = "5m"
     timeout = "10s"
     type = "http"
     path = "/health"
