@@ -89,21 +89,25 @@ advanced_retriever = MultiQueryRetriever(
 
 _scope_prompt = ChatPromptTemplate.from_template(
     "Classify the message below into exactly one of: 'rag', 'greeting', or 'out_of_scope'.\n\n"
-    "- 'rag': any question or statement related to technology, computer science, or the curriculum — including:\n"
-    "  * Curriculum modules, lessons, or student-facing activities\n"
+    "DEFAULT RULE: When in doubt, always classify as 'rag'.\n\n"
+    "- 'rag': any question, statement, or request that could relate to the curriculum or technology — including:\n"
+    "  * Any reference to a module, lesson, activity, or numbered item (e.g. 'activity 4.4', 'module 3', 'lesson 2')\n"
     "  * Named activities: AHA Adventure Land, AHA Card Game (Module 4)\n"
     "  * Hardware: ESP32, ESP microcontrollers, Arduino boards, sensors, actuators, microcontrollers\n"
     "  * Software: Arduino IDE, Edge Impulse, edge-impulse-daemon, any coding/programming tools\n"
     "  * Setup, configuration, installation, wiring, or troubleshooting\n"
-    "  * Computer science, coding, programming concepts\n"
+    "  * Computer science, coding, programming, algorithms, data structures\n"
     "  * Embedded systems, electronics, circuits\n"
     "  * Artificial intelligence, machine learning, edge AI, neural networks, data collection\n"
     "  * Sensors: accelerometers, microphones, cameras, temperature sensors, etc.\n"
     "  * Any STEM or technical concept a teacher might ask about in this course\n"
-    "- 'greeting': casual social messages (hi, hello, thanks, good morning, how are you, etc.)\n"
-    "- 'out_of_scope': only for clearly unrelated topics (cooking, sports, politics, geography, etc.)\n\n"
-    "When in doubt, classify as 'rag'.\n\n"
+    "  * Vague or short questions that could be about the curriculum ('tell me more', 'what is that', 'how does it work')\n"
+    "- 'greeting': only clear casual social messages with no technical content (hi, hello, thanks, good morning, how are you)\n"
+    "- 'out_of_scope': only for topics with zero possible connection to the curriculum (cooking recipes, sports scores, politics, celebrity news)\n\n"
     "Examples:\n"
+    "Message: tell me more about activity 4.4 → rag\n"
+    "Message: what is module 3 about → rag\n"
+    "Message: explain lesson 2.1 → rag\n"
     "Message: How do I install the Arduino IDE? → rag\n"
     "Message: What is AHA Adventure Land? → rag\n"
     "Message: How does the AHA Card Game activity work? → rag\n"
@@ -111,7 +115,6 @@ _scope_prompt = ChatPromptTemplate.from_template(
     "Message: What is a for loop? → rag\n"
     "Message: How do sensors work? → rag\n"
     "Message: What is machine learning? → rag\n"
-    "Message: How do I read accelerometer data? → rag\n"
     "Message: Hello! → greeting\n"
     "Message: Thanks for your help → greeting\n"
     "Message: What is the capital of France? → out_of_scope\n"
@@ -137,8 +140,8 @@ def classify_query(question: str) -> str:
         return "rag"
     if "out_of_scope" in result or "out of scope" in result:
         return "out_of_scope"
-    # Fallback: very short inputs are almost always greetings
-    return "greeting" if len(question.split()) <= 4 else "out_of_scope"
+    # Fallback: send to RAG rather than silently dropping ambiguous queries
+    return "rag"
 
 
 def get_greeting_response(question: str) -> str:
